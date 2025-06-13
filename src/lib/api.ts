@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // Create axios instance
 export const api = axios.create({
@@ -72,39 +72,39 @@ export const handleApiError = (error: unknown): string => {
 // API endpoints
 export const ENDPOINTS = {
   AUTH: {
-    REGISTER: '/auth/register',
-    LOGIN: '/auth/login',
-    ME: '/auth/me',
-    PROFILE: '/auth/profile',
-    CHANGE_PASSWORD: '/auth/change-password',
-    LOGOUT: '/auth/logout',
+    LOGIN: '/api/auth/login',
+    REGISTER: '/api/auth/register',
+    LOGOUT: '/api/auth/logout',
+    REFRESH: '/api/auth/refresh',
+    FORGOT_PASSWORD: '/api/auth/forgot-password',
+    RESET_PASSWORD: '/api/auth/reset-password',
   },
   USERS: {
-    LIST: '/users',
-    DETAIL: (id: string) => `/users/${id}`,
-    CREATE: '/users',
-    UPDATE: (id: string) => `/users/${id}`,
-    DELETE: (id: string) => `/users/${id}`,
+    PROFILE: '/api/users/profile',
+    UPDATE_PROFILE: '/api/users/profile',
+    CHANGE_PASSWORD: '/api/users/change-password',
   },
   INCOME: {
-    LIST: '/income',
-    STATS: '/income/stats',
-    DETAIL: (id: string) => `/income/${id}`,
-    CREATE: '/income',
-    UPDATE: (id: string) => `/income/${id}`,
-    DELETE: (id: string) => `/income/${id}`,
+    LIST: '/api/income',
+    CREATE: '/api/income',
+    DETAIL: (id: string) => `/api/income/${id}`,
+    UPDATE: (id: string) => `/api/income/${id}`,
+    DELETE: (id: string) => `/api/income/${id}`,
+    STATS: '/api/income/stats',
+    UPLOAD_CSV: '/api/income/upload-csv',
   },
   EXPENSES: {
-    LIST: '/expenses',
-    STATS: '/expenses/stats',
-    DETAIL: (id: string) => `/expenses/${id}`,
-    CREATE: '/expenses',
-    UPDATE: (id: string) => `/expenses/${id}`,
-    DELETE: (id: string) => `/expenses/${id}`,
+    LIST: '/api/expenses',
+    CREATE: '/api/expenses',
+    DETAIL: (id: string) => `/api/expenses/${id}`,
+    UPDATE: (id: string) => `/api/expenses/${id}`,
+    DELETE: (id: string) => `/api/expenses/${id}`,
+    STATS: '/api/expenses/stats',
+    UPLOAD_CSV: '/api/expenses/upload-csv',
   },
   REPORTS: {
-    DASHBOARD: '/reports/dashboard',
-    FINANCIAL: '/reports/financial',
-    TEAM: '/reports/team',
+    DASHBOARD: '/api/reports/dashboard',
+    FINANCIAL: '/api/reports/financial',
+    TEAM: '/api/reports/team',
   },
 } as const;

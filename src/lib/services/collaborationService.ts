@@ -101,7 +101,7 @@ export const collaborationService = {
       if (filters.status) params.append('status', filters.status);
 
       const response = await api.get<ApiResponse<CollaborationListResponse>>(
-        `/collaborations?${params.toString()}`
+        `/api/collaborations?${params.toString()}`
       );
       return response.data;
     } catch (error) {
@@ -113,7 +113,7 @@ export const collaborationService = {
   async getCollaboration(id: string): Promise<ApiResponse<Collaboration & { stats: CollaborationStats }>> {
     try {
       const response = await api.get<ApiResponse<Collaboration & { stats: CollaborationStats }>>(
-        `/collaborations/${id}`
+        `/api/collaborations/${id}`
       );
       return response.data;
     } catch (error) {
@@ -124,7 +124,7 @@ export const collaborationService = {
   // Create collaboration
   async createCollaboration(data: CreateCollaborationData): Promise<ApiResponse<Collaboration>> {
     try {
-      const response = await api.post<ApiResponse<Collaboration>>('/collaborations', data);
+      const response = await api.post<ApiResponse<Collaboration>>('/api/collaborations', data);
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -134,7 +134,7 @@ export const collaborationService = {
   // Update collaboration
   async updateCollaboration(id: string, data: UpdateCollaborationData): Promise<ApiResponse<Collaboration>> {
     try {
-      const response = await api.put<ApiResponse<Collaboration>>(`/collaborations/${id}`, data);
+      const response = await api.put<ApiResponse<Collaboration>>(`/api/collaborations/${id}`, data);
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -145,7 +145,7 @@ export const collaborationService = {
   async addMember(collaborationId: string, data: AddMemberData): Promise<ApiResponse<Collaboration>> {
     try {
       const response = await api.post<ApiResponse<Collaboration>>(
-        `/collaborations/${collaborationId}/members`,
+        `/api/collaborations/${collaborationId}/members`,
         data
       );
       return response.data;
@@ -158,7 +158,7 @@ export const collaborationService = {
   async removeMember(collaborationId: string, userId: string): Promise<ApiResponse<Collaboration>> {
     try {
       const response = await api.delete<ApiResponse<Collaboration>>(
-        `/collaborations/${collaborationId}/members/${userId}`
+        `/api/collaborations/${collaborationId}/members/${userId}`
       );
       return response.data;
     } catch (error) {
@@ -169,7 +169,7 @@ export const collaborationService = {
   // Delete collaboration
   async deleteCollaboration(id: string): Promise<ApiResponse<null>> {
     try {
-      const response = await api.delete<ApiResponse<null>>(`/collaborations/${id}`);
+      const response = await api.delete<ApiResponse<null>>(`/api/collaborations/${id}`);
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));

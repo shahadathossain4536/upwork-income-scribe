@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CalendarIcon, Plus, Edit, FileText, DollarSign, TrendingUp, Users, BarChart3, UserPlus } from 'lucide-react';
+import { CalendarIcon, Plus, Edit, FileText, DollarSign, TrendingUp, Users, BarChart3, UserPlus, Upload } from 'lucide-react';
 import IncomeModal from '@/components/IncomeModal';
 import CostModal from '@/components/CostModal';
 import SummarySection from '@/components/SummarySection';
@@ -13,6 +13,7 @@ import { expenseService } from '@/lib/services/expenseService';
 import { collaborationService, Collaboration } from '@/lib/services/collaborationService';
 import { toast } from 'sonner';
 import { reportsService } from '@/lib/services/reportsService';
+import CSVUploadModal from '@/components/CSVUploadModal';
 
 export interface IncomeEntry {
   _id: string;
@@ -81,6 +82,9 @@ const Index = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [netProfit, setNetProfit] = useState(0);
+
+  const [isCSVUploadModalOpen, setIsCSVUploadModalOpen] = useState(false);
+  const [csvUploadType, setCsvUploadType] = useState<'income' | 'expense'>('income');
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -350,6 +354,24 @@ const Index = () => {
     const endDate = formatDate(selectedYear, selectedMonth + 1, 0);
 
     return { startDate, endDate };
+  };
+
+  const handleCSVUpload = async (file: File) => {
+    try {
+      if (csvUploadType === 'income') {
+        return await incomeService.uploadCSV(file);
+      } else {
+        return await expenseService.uploadCSV(file);
+      }
+    } catch (error) {
+      console.error('CSV upload error:', error);
+      throw error;
+    }
+  };
+
+  const openCSVUploadModal = (type: 'income' | 'expense') => {
+    setCsvUploadType(type);
+    setIsCSVUploadModalOpen(true);
   };
 
   return (
@@ -641,15 +663,26 @@ const Index = () => {
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle className="text-green-600">💰 Income</CardTitle>
-              <Button
-                onClick={() => setIsIncomeModalOpen(true)}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={isLoading}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Income
-              </Button>
+              <CardTitle className="text-green-600">💰 Income {incomeEntries.length > 0 ? `(${incomeEntries.length})` : ''}</CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => openCSVUploadModal('income')}
+                  variant="outline"
+                  className="border-green-600 text-green-600 hover:bg-green-50"
+                  disabled={isLoading}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload CSV
+                </Button>
+                <Button
+                  onClick={() => setIsIncomeModalOpen(true)}
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={isLoading}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Income
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -720,14 +753,25 @@ const Index = () => {
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-red-600">💸 Expenses</CardTitle>
-              <Button
-                onClick={() => setIsCostModalOpen(true)}
-                className="bg-red-600 hover:bg-red-700"
-                disabled={isLoading}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add Cost
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => openCSVUploadModal('expense')}
+                  variant="outline"
+                  className="border-red-600 text-red-600 hover:bg-red-50"
+                  disabled={isLoading}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload CSV
+                </Button>
+                <Button
+                  onClick={() => setIsCostModalOpen(true)}
+                  className="bg-red-600 hover:bg-red-700"
+                  disabled={isLoading}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Cost
+                </Button>
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -824,6 +868,15 @@ const Index = () => {
           editData={editingCostId ? costEntries.find(e => e._id === editingCostId) : undefined}
           isLoading={isAddingExpense}
           currentReportDates={getCurrentReportDates()}
+        />
+
+        {/* CSV Upload Modal */}
+        <CSVUploadModal
+          isOpen={isCSVUploadModalOpen}
+          onClose={() => setIsCSVUploadModalOpen(false)}
+          onUpload={handleCSVUpload}
+          type={csvUploadType}
+          isLoading={isLoading}
         />
       </div>
     </div>

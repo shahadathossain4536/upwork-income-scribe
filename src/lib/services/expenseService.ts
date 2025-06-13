@@ -185,5 +185,26 @@ export const expenseService = {
     } catch (error) {
       throw new Error(handleApiError(error));
     }
+  },
+
+  // Upload CSV file
+  async uploadCSV(file: File): Promise<ApiResponse<any>> {
+    try {
+      const formData = new FormData();
+      formData.append('csvFile', file);
+
+      const response = await api.post<ApiResponse<any>>(
+        `${ENDPOINTS.EXPENSES.UPLOAD_CSV}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
   }
 };
