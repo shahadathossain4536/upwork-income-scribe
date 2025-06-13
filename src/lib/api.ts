@@ -1,3 +1,4 @@
+
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 // API Configuration
@@ -78,6 +79,9 @@ export const ENDPOINTS = {
     REFRESH: '/api/auth/refresh',
     FORGOT_PASSWORD: '/api/auth/forgot-password',
     RESET_PASSWORD: '/api/auth/reset-password',
+    ME: '/api/auth/me',
+    PROFILE: '/api/users/profile',
+    CHANGE_PASSWORD: '/api/users/change-password',
   },
   USERS: {
     PROFILE: '/api/users/profile',

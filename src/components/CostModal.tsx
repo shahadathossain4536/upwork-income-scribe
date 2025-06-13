@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ interface CostModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: { date: string; costTitle: string; costAmount: number; workDate: string }) => void;
-  editData?: { date: string; title: string; amount: number, workDate: string };
+  editData?: { date: string; title: string; amount: number; workDate?: string };
   isLoading?: boolean;
   currentReportDates?: { startDate: string; endDate: string };
 }
@@ -27,7 +28,7 @@ const CostModal: React.FC<CostModalProps> = ({ isOpen, onClose, onSubmit, editDa
         date: editData.date,
         costTitle: editData.title,
         costAmount: editData.amount,
-        workDate: editData.workDate
+        workDate: editData.workDate || ''
       });
     } else {
       const defaultDate = currentReportDates?.startDate || new Date().toISOString().split('T')[0];

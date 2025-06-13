@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -149,9 +150,9 @@ const Reports = () => {
       });
 
       setReportData({
-        income: incomeResponse.success ? (incomeResponse.data || []) : [],
-        expenses: expenseResponse.success ? (expenseResponse.data || []) : [],
-        collaborations: collaborationResponse.success ? (collaborationResponse.data || []) : [],
+        income: incomeResponse.success ? (Array.isArray(incomeResponse.data) ? incomeResponse.data : []) : [],
+        expenses: expenseResponse.success ? (Array.isArray(expenseResponse.data) ? expenseResponse.data : []) : [],
+        collaborations: collaborationResponse.success ? (Array.isArray(collaborationResponse.data) ? collaborationResponse.data : []) : [],
         dateRange: { startDate, endDate }
       });
 
@@ -218,6 +219,7 @@ const Reports = () => {
 
     monthlyData.push({
       name: monthName,
+      value: monthIncome - monthExpenses,
       income: monthIncome,
       expenses: monthExpenses,
       profit: monthIncome - monthExpenses

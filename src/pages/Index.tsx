@@ -771,7 +771,10 @@ const Index = () => {
               setEditingIncomeId(null);
             }}
             onSubmit={editingIncomeId ? (data) => handleEditIncome(editingIncomeId, data) : handleAddIncome}
-            editData={editingIncomeId ? incomeEntries.find(e => e._id === editingIncomeId) : undefined}
+            editData={editingIncomeId ? {
+              ...incomeEntries.find(e => e._id === editingIncomeId)!,
+              workDate: incomeEntries.find(e => e._id === editingIncomeId)?.workDate || ''
+            } : undefined}
             isLoading={isAddingIncome}
             currentReportDates={getCurrentReportDates()}
           />
@@ -783,7 +786,10 @@ const Index = () => {
               setEditingCostId(null);
             }}
             onSubmit={editingCostId ? (data) => handleEditCost(editingCostId, data) : handleAddCost}
-            editData={editingCostId ? costEntries.find(e => e._id === editingCostId) : undefined}
+            editData={editingCostId ? {
+              ...costEntries.find(e => e._id === editingCostId)!,
+              workDate: costEntries.find(e => e._id === editingCostId)?.workDate || ''
+            } : undefined}
             isLoading={isAddingExpense}
             currentReportDates={getCurrentReportDates()}
           />
