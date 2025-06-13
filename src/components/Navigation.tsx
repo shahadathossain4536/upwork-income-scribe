@@ -1,17 +1,18 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
-  Home,
-  Users,
-  DollarSign,
-  BarChart3,
-  Settings,
-  LogOut,
-  User,
-  Menu,
-  X
-} from 'lucide-react';
+  FaHome,
+  FaUsers,
+  FaDollarSign,
+  FaChartBar,
+  FaCog,
+  FaSignOutAlt,
+  FaUser,
+  FaBars,
+  FaTimes
+} from 'react-icons/fa';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,11 +28,11 @@ const Navigation = () => {
   const location = useLocation();
 
   const navigationItems = [
-    { name: 'Dashboard', href: '/', icon: Home },
-    { name: 'Income List', href: '/income', icon: DollarSign },
-    { name: 'Collaborations', href: '/collaborations', icon: Users },
-    { name: 'User Management', href: '/users', icon: Users },
-    { name: 'Reports', href: '/reports', icon: BarChart3 },
+    { name: 'Dashboard', href: '/', icon: FaHome },
+    { name: 'Income List', href: '/income', icon: FaDollarSign },
+    { name: 'Collaborations', href: '/collaborations', icon: FaUsers },
+    { name: 'User Management', href: '/users', icon: FaUsers },
+    { name: 'Reports', href: '/reports', icon: FaChartBar },
   ];
 
   const isActive = (path: string) => {
@@ -47,33 +48,33 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+    <nav className="bg-white shadow-lg border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo and Desktop Navigation */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">💰</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <FaChartBar className="text-white text-lg" />
               </div>
-              <span className="text-xl font-bold text-gray-900">Upwork Tracker</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">Upwork Tracker</span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:ml-10 md:flex md:space-x-8">
+            <div className="hidden md:ml-10 md:flex md:space-x-1">
               {navigationItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link
                     key={item.name}
                     to={item.href}
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                    className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       isActive(item.href)
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
-                    <Icon className="h-4 w-4 mr-2" />
+                    <Icon className="mr-2" />
                     {item.name}
                   </Link>
                 );
@@ -86,8 +87,8 @@ const Navigation = () => {
             {/* User Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                <Button variant="ghost" className="flex items-center space-x-3 px-3 py-2 rounded-xl hover:bg-gray-50">
+                  <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center shadow-md">
                     <span className="text-white font-bold text-sm">
                       {user?.firstName?.[0]}{user?.lastName?.[0]}
                     </span>
@@ -97,17 +98,17 @@ const Navigation = () => {
                   </span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => navigate('/profile')}>
-                  <User className="h-4 w-4 mr-2" />
+              <DropdownMenuContent align="end" className="w-56 bg-white shadow-xl border border-gray-200 rounded-xl">
+                <DropdownMenuItem onClick={() => navigate('/profile')} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg">
+                  <FaUser className="text-gray-500" />
                   Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/settings')}>
-                  <Settings className="h-4 w-4 mr-2" />
+                <DropdownMenuItem onClick={() => navigate('/settings')} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg">
+                  <FaCog className="text-gray-500" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
-                  <LogOut className="h-4 w-4 mr-2" />
+                <DropdownMenuItem className="text-red-600 flex items-center gap-3 px-4 py-3 hover:bg-red-50 rounded-lg" onClick={handleLogout}>
+                  <FaSignOutAlt className="text-red-500" />
                   Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -117,13 +118,13 @@ const Navigation = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden"
+              className="md:hidden p-2 rounded-lg hover:bg-gray-50"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <FaTimes className="h-5 w-5" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <FaBars className="h-5 w-5" />
               )}
             </Button>
           </div>
@@ -132,41 +133,41 @@ const Navigation = () => {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+        <div className="md:hidden border-t border-gray-200 bg-white">
+          <div className="px-4 pt-4 pb-6 space-y-2">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`flex items-center px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                  className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
                     isActive(item.href)
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <Icon className="h-5 w-5 mr-3" />
+                  <Icon className="mr-3" />
                   {item.name}
                 </Link>
               );
             })}
-            <div className="border-t border-gray-200 pt-2 mt-2">
+            <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
               <Link
                 to="/profile"
-                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                className="flex items-center px-4 py-3 rounded-xl text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <User className="h-5 w-5 mr-3" />
+                <FaUser className="mr-3" />
                 Profile
               </Link>
               <Link
                 to="/settings"
-                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                className="flex items-center px-4 py-3 rounded-xl text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                <Settings className="h-5 w-5 mr-3" />
+                <FaCog className="mr-3" />
                 Settings
               </Link>
               <button
@@ -174,9 +175,9 @@ const Navigation = () => {
                   handleLogout();
                   setIsMobileMenuOpen(false);
                 }}
-                className="flex items-center w-full px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
+                className="flex items-center w-full px-4 py-3 rounded-xl text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                <LogOut className="h-5 w-5 mr-3" />
+                <FaSignOutAlt className="mr-3" />
                 Sign Out
               </button>
             </div>
