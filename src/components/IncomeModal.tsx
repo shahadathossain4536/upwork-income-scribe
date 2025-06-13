@@ -1,24 +1,25 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IncomeEntry } from '@/pages/Index';
 
 interface IncomeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: Omit<IncomeEntry, 'id' | 'isEditing'>) => void;
-  editData?: IncomeEntry;
+  onSubmit: (data: { date: string; jobTitle: string; clientName: string; billAmount: number; workDate: string }) => void;
+  editData?: { date: string; jobTitle: string; clientName: string; amount: number, workDate: string };
+  isLoading?: boolean;
+  currentReportDates?: { startDate: string; endDate: string };
 }
 
-const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, editData }) => {
+const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, editData, isLoading = false, currentReportDates }) => {
   const [formData, setFormData] = useState({
     date: '',
     jobTitle: '',
     clientName: '',
-    billAmount: 0
+    billAmount: 0,
+    workDate: ''
   });
 
   useEffect(() => {
@@ -27,30 +28,34 @@ const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, ed
         date: editData.date,
         jobTitle: editData.jobTitle,
         clientName: editData.clientName,
-        billAmount: editData.billAmount
+        billAmount: editData.amount,
+        workDate: editData.workDate
       });
     } else {
+      const defaultDate = currentReportDates?.startDate || new Date().toISOString().split('T')[0];
       setFormData({
-        date: new Date().toISOString().split('T')[0],
+        date: defaultDate,
         jobTitle: '',
         clientName: '',
-        billAmount: 0
+        billAmount: 0,
+        workDate: defaultDate
       });
     }
-  }, [editData, isOpen]);
+  }, [editData, isOpen, currentReportDates]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.jobTitle || !formData.clientName || formData.billAmount <= 0) {
+    if (!formData.jobTitle || !formData.clientName || formData.billAmount <= 0 || isLoading) {
       return;
     }
-    
+
     onSubmit(formData);
     setFormData({
       date: new Date().toISOString().split('T')[0],
       jobTitle: '',
       clientName: '',
-      billAmount: 0
+      billAmount: 0,
+      workDate: ''
     });
   };
 
@@ -69,8 +74,17 @@ const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, ed
             {editData ? 'Edit Income Entry' : 'Add Income Entry'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="workDate">Work Date</Label>
+            <Input
+              id="workDate"
+              type="date"
+              value={formData.workDate}
+              onChange={e => setFormData({ ...formData, workDate: e.target.value })}
+            />
+          </div>
           <div>
             <Label htmlFor="date">📅 Date</Label>
             <Input
@@ -79,6 +93,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, ed
               value={formData.date}
               onChange={(e) => handleInputChange('date', e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -90,6 +105,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, ed
               value={formData.jobTitle}
               onChange={(e) => handleInputChange('jobTitle', e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -101,6 +117,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, ed
               value={formData.clientName}
               onChange={(e) => handleInputChange('clientName', e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -115,15 +132,35 @@ const IncomeModal: React.FC<IncomeModalProps> = ({ isOpen, onClose, onSubmit, ed
               value={formData.billAmount || ''}
               onChange={(e) => handleInputChange('billAmount', parseFloat(e.target.value) || 0)}
               required
+              disabled={isLoading}
             />
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1"
+              disabled={isLoading}
+            >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 bg-green-600 hover:bg-green-700">
-              ✅ {editData ? 'Update' : 'Save'}
+            <Button
+              type="submit"
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {editData ? 'Updating...' : 'Saving...'}
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  ✅ {editData ? 'Update' : 'Save'}
+                </div>
+              )}
             </Button>
           </div>
         </form>

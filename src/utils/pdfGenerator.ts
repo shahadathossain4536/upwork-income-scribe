@@ -1,169 +1,103 @@
-
 import jsPDF from 'jspdf';
-import { IncomeEntry, CostEntry, Collaborator } from '@/pages/Index';
+import autoTable from 'jspdf-autotable';
 
-interface ReportData {
-  month: string;
-  year: number;
-  incomeEntries: IncomeEntry[];
-  costEntries: CostEntry[];
-  collaborators: Collaborator[];
-  totalIncome: number;
-  totalCosts: number;
-  netProfit: number;
-}
+export function generatePDF({
+  month,
+  year,
+  incomeEntries,
+  costEntries,
+  collaborations,
+  totalIncome,
+  totalCosts,
+  netProfit
+}: any) {
+  const doc = new jsPDF();
 
-export const generatePDF = (data: ReportData) => {
-  const pdf = new jsPDF();
-  let yPosition = 20;
-  const pageHeight = pdf.internal.pageSize.height;
-  const margin = 20;
+  // Header
+  doc.setFontSize(18);
+  doc.text('Income & Expense Report', 105, 18, { align: 'center' });
 
-  // Helper function to check if we need a new page
-  const checkPageBreak = (requiredSpace: number) => {
-    if (yPosition + requiredSpace > pageHeight - margin) {
-      pdf.addPage();
-      yPosition = 20;
-    }
-  };
+  doc.setFontSize(12);
+  doc.text(`Period: ${month} ${year}`, 105, 28, { align: 'center' });
+  doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 36, { align: 'center' });
 
-  // Title
-  pdf.setFontSize(24);
-  pdf.setFont('helvetica', 'bold');
-  pdf.text('Upwork Monthly Income Report', margin, yPosition);
-  yPosition += 15;
+  // Summary Section
+  doc.setFontSize(14);
+  doc.text('Summary', 14, 50);
+  doc.setFontSize(12);
+  doc.text(`Total Income: $${totalIncome.toLocaleString()}`, 14, 58);
+  doc.text(`Total Expenses: $${totalCosts.toLocaleString()}`, 14, 66);
+  doc.text(`Net Profit: $${netProfit.toLocaleString()}`, 14, 74);
 
-  // Period
-  pdf.setFontSize(16);
-  pdf.setFont('helvetica', 'normal');
-  pdf.text(`${data.month} ${data.year}`, margin, yPosition);
-  yPosition += 20;
+  // Income Table
+  doc.setFontSize(14);
+  doc.text('Income Entries', 14, 90);
+  autoTable(doc, {
+    startY: 95,
+    head: [['Date', 'Job Title', 'Client Name', 'Amount ($)']],
+    body: incomeEntries.map((entry: any) => [
+      new Date(entry.date).toLocaleDateString(),
+      entry.jobTitle,
+      entry.clientName,
+      entry.amount.toFixed(2)
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [46, 204, 113] },
+    styles: { fontSize: 10, cellPadding: 2 },
+    margin: { left: 14, right: 14 }
+  });
 
-  // Income Section
-  checkPageBreak(30);
-  pdf.setFontSize(18);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setTextColor(34, 197, 94); // Green color
-  pdf.text('Income Entries', margin, yPosition);
-  yPosition += 10;
+  // Expenses Table
+  const finalY = (doc as any).lastAutoTable.finalY || 105;
+  doc.setFontSize(14);
+  doc.text('Expense Entries', 14, finalY + 14);
+  autoTable(doc, {
+    startY: finalY + 18,
+    head: [['Date', 'Description', 'Amount ($)']],
+    body: costEntries.map((entry: any) => [
+      new Date(entry.date).toLocaleDateString(),
+      entry.title,
+      entry.amount.toFixed(2)
+    ]),
+    theme: 'grid',
+    headStyles: { fillColor: [231, 76, 60] },
+    styles: { fontSize: 10, cellPadding: 2 },
+    margin: { left: 14, right: 14 }
+  });
 
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFont('helvetica', 'normal');
+  // Work Together (Collaborations)
+  doc.setFontSize(14);
+  doc.text('Work Together (Collaborations)', 14, finalY + 14);
 
-  if (data.incomeEntries.length === 0) {
-    pdf.text('No income entries recorded.', margin, yPosition);
-    yPosition += 10;
+  if (collaborations && collaborations.length > 0) {
+    collaborations.forEach((collab: any, idx: number) => {
+      const y = (doc as any).lastAutoTable?.finalY + 10 || finalY + 22 + idx * 8;
+      doc.setFontSize(12);
+      doc.text(`${collab.name}${collab.description ? ' - ' + collab.description : ''}`, 16, y);
+
+      // Table for members
+      autoTable(doc, {
+        startY: y + 2,
+        head: [['Member', 'Share (%)', 'Profit Share ($)']],
+        body: collab.members.map((member: any) => [
+          `${member.user.firstName || ''} ${member.user.lastName || ''}`.trim() || member.user.email || member.user._id,
+          member.sharePercentage + '%',
+          netProfit > 0 ? ((netProfit * member.sharePercentage) / 100).toFixed(2) : '0.00'
+        ]),
+        theme: 'grid',
+        headStyles: { fillColor: [155, 89, 182] },
+        styles: { fontSize: 10, cellPadding: 2 },
+        margin: { left: 22, right: 14 }
+      });
+    });
   } else {
-    // Income table headers
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Date', margin, yPosition);
-    pdf.text('Job Title', margin + 30, yPosition);
-    pdf.text('Client Name', margin + 80, yPosition);
-    pdf.text('Amount ($)', margin + 130, yPosition);
-    yPosition += 8;
-
-    // Income entries
-    pdf.setFont('helvetica', 'normal');
-    data.incomeEntries.forEach((entry) => {
-      checkPageBreak(8);
-      pdf.text(entry.date, margin, yPosition);
-      pdf.text(entry.jobTitle.substring(0, 25), margin + 30, yPosition);
-      pdf.text(entry.clientName.substring(0, 25), margin + 80, yPosition);
-      pdf.text(entry.billAmount.toFixed(2), margin + 130, yPosition);
-      yPosition += 8;
-    });
-  }
-
-  yPosition += 10;
-
-  // Cost Section
-  checkPageBreak(30);
-  pdf.setFontSize(18);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setTextColor(239, 68, 68); // Red color
-  pdf.text('Expense Entries', margin, yPosition);
-  yPosition += 10;
-
-  pdf.setFontSize(10);
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFont('helvetica', 'normal');
-
-  if (data.costEntries.length === 0) {
-    pdf.text('No expense entries recorded.', margin, yPosition);
-    yPosition += 10;
-  } else {
-    // Cost table headers
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Date', margin, yPosition);
-    pdf.text('Description', margin + 30, yPosition);
-    pdf.text('Amount ($)', margin + 130, yPosition);
-    yPosition += 8;
-
-    // Cost entries
-    pdf.setFont('helvetica', 'normal');
-    data.costEntries.forEach((entry) => {
-      checkPageBreak(8);
-      pdf.text(entry.date, margin, yPosition);
-      pdf.text(entry.costTitle.substring(0, 50), margin + 30, yPosition);
-      pdf.text(entry.costAmount.toFixed(2), margin + 130, yPosition);
-      yPosition += 8;
-    });
-  }
-
-  yPosition += 15;
-
-  // Financial Summary
-  checkPageBreak(40);
-  pdf.setFontSize(18);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setTextColor(37, 99, 235); // Blue color
-  pdf.text('Financial Summary', margin, yPosition);
-  yPosition += 15;
-
-  pdf.setFontSize(12);
-  pdf.setTextColor(0, 0, 0);
-  
-  pdf.setTextColor(34, 197, 94); // Green
-  pdf.text(`Total Income: $${data.totalIncome.toFixed(2)}`, margin, yPosition);
-  yPosition += 8;
-
-  pdf.setTextColor(239, 68, 68); // Red
-  pdf.text(`Total Expenses: $${data.totalCosts.toFixed(2)}`, margin, yPosition);
-  yPosition += 8;
-
-  pdf.setTextColor(data.netProfit >= 0 ? 37 : 234, data.netProfit >= 0 ? 99 : 88, data.netProfit >= 0 ? 235 : 58);
-  pdf.text(`Net Profit: $${data.netProfit.toFixed(2)}`, margin, yPosition);
-  yPosition += 15;
-
-  // Collaborators Section
-  if (data.collaborators.length > 0) {
-    checkPageBreak(30);
-    pdf.setFontSize(18);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(147, 51, 234); // Purple color
-    pdf.text('Profit Sharing', margin, yPosition);
-    yPosition += 10;
-
-    pdf.setFontSize(10);
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFont('helvetica', 'normal');
-
-    data.collaborators.forEach((collaborator) => {
-      if (collaborator.name) {
-        checkPageBreak(8);
-        const share = (data.netProfit * collaborator.sharePercentage / 100);
-        pdf.text(`${collaborator.name}: ${collaborator.sharePercentage}% = $${share.toFixed(2)}`, margin, yPosition);
-        yPosition += 8;
-      }
-    });
+    doc.setFontSize(12);
+    doc.text('No collaborations found for this period.', 16, finalY + 22);
   }
 
   // Footer
-  pdf.setFontSize(8);
-  pdf.setTextColor(128, 128, 128);
-  pdf.text(`Generated on ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+  doc.setFontSize(10);
+  doc.text('Generated by Upwork Income Scribe', 105, 285, { align: 'center' });
 
-  // Save the PDF
-  pdf.save(`Upwork_Report_${data.month}_${data.year}.pdf`);
-};
+  doc.save(`Income_Expense_Report_${month}_${year}.pdf`);
+}

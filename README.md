@@ -1,73 +1,221 @@
-# Welcome to your Lovable project
+# Upwork Income Tracker
 
-## Project info
+A modern, responsive web application for tracking freelance income, expenses, and generating professional reports with full authentication system.
 
-**URL**: https://lovable.dev/projects/ee8fd932-6db1-458c-bbe0-db61414c2c46
+## 🚀 Features
 
-## How can I edit this code?
+### 🔐 Authentication System
 
-There are several ways of editing your application.
+- **Complete Authentication Flow**
+  - User registration with validation
+  - Secure login with error handling
+  - Protected routes with authentication guards
+  - Persistent sessions with localStorage
+  - Automatic redirect to login for unauthenticated users
 
-**Use Lovable**
+- **User Management**
+  - Profile management with editable information
+  - Settings page with comprehensive options
+  - Password change functionality
+  - Account preferences and privacy settings
+  - Logout functionality
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ee8fd932-6db1-458c-bbe0-db61414c2c46) and start prompting.
+### ✨ Enhanced Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Modern Authentication Pages**
+  - Beautiful sign-in and sign-up pages with password strength validation
+  - Social login options (GitHub, Google) - UI ready
+  - Remember me functionality
+  - Demo credentials for testing
 
-**Use your preferred IDE**
+- **Comprehensive User Management**
+  - User list with search and filtering
+  - Role-based access control (Admin, User, Collaborator)
+  - User status tracking (Active, Inactive, Pending)
+  - Share percentage management for collaborators
+  - Import/Export functionality
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Advanced Income Tracking**
+  - Dedicated income list page with advanced filtering
+  - Category-based income organization
+  - Payment status tracking (Paid, Pending, Overdue)
+  - Invoice number tracking
+  - Chart and table view modes
+  - Real-time statistics and analytics
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Profile & Settings**
+  - Complete profile management
+  - Account statistics and information
+  - Notification preferences
+  - Privacy settings
+  - Appearance customization
+  - Password management
 
-Follow these steps:
+### 📊 Dashboard Features
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+- **Quick Stats Overview**
+  - Total income, expenses, net profit, and collaborator count
+  - Visual indicators with icons and color-coded cards
+  - Real-time calculations
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Enhanced Data Entry**
+  - Improved modals for adding/editing income and expenses
+  - Better form validation and user feedback
+  - Date picker integration
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Professional Reporting**
+  - PDF generation with comprehensive data
+  - Monthly and yearly filtering
+  - Collaborator profit sharing calculations
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 🛠️ Technology Stack
+
+- **Frontend Framework**: React 18 with TypeScript
+- **UI Components**: shadcn/ui with Tailwind CSS
+- **Routing**: React Router DOM v6 with protected routes
+- **State Management**: React Context for authentication, React Query for server state
+- **Authentication**: Custom auth context with localStorage persistence
+- **Charts**: Recharts for data visualization
+- **Icons**: Lucide React
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS with custom gradients
+
+## 📱 Pages
+
+1. **Sign In** (`/signin`) - Authentication page with demo credentials
+2. **Sign Up** (`/signup`) - Registration with password strength validation
+3. **Dashboard** (`/`) - Main overview with quick stats and data entry (Protected)
+4. **Income List** (`/income`) - Comprehensive income tracking with charts (Protected)
+5. **User Management** (`/users`) - Team and collaborator management (Protected)
+6. **Profile** (`/profile`) - User profile management (Protected)
+7. **Settings** (`/settings`) - Account settings and preferences (Protected)
+8. **Reports** (`/reports`) - Advanced reporting (Protected, coming soon)
+
+## 🔐 Authentication
+
+### Demo Credentials
+- **Email**: `demo@example.com`
+- **Password**: `password`
+
+### Features
+- Automatic session persistence
+- Protected route guards
+- Loading states during authentication
+- Error handling and user feedback
+- Secure logout functionality
+
+## 🎨 Design Improvements
+
+- **Color Scheme**: Professional blue-purple gradient theme
+- **Typography**: Modern font hierarchy with proper spacing
+- **Layout**: Responsive grid system with proper breakpoints
+- **Components**: Consistent card designs with shadows and borders
+- **Animations**: Smooth transitions and hover effects
+- **Accessibility**: Proper contrast ratios and focus states
+- **Loading States**: Spinners and skeleton screens
+
+## 🚀 Getting Started
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Start Development Server**
+   ```bash
+   npm run dev
+   ```
+
+3. **Access the Application**
+   - Open your browser to `http://localhost:5173`
+   - Use demo credentials to sign in: `demo@example.com` / `password`
+   - Or create a new account through the sign-up page
+
+4. **Build for Production**
+   ```bash
+   npm run build
+   ```
+
+## 📁 Project Structure
+
+```
+src/
+├── components/
+│   ├── ui/           # shadcn/ui components
+│   ├── Navigation.tsx
+│   ├── IncomeModal.tsx
+│   ├── CostModal.tsx
+│   ├── SummarySection.tsx
+│   └── CollaboratorSection.tsx
+├── contexts/
+│   └── AuthContext.tsx  # Authentication context
+├── pages/
+│   ├── SignIn.tsx    # Authentication
+│   ├── SignUp.tsx    # Registration
+│   ├── Index.tsx     # Dashboard (Protected)
+│   ├── UserList.tsx  # User management (Protected)
+│   ├── IncomeList.tsx # Income tracking (Protected)
+│   ├── Profile.tsx   # User profile (Protected)
+│   ├── Settings.tsx  # Account settings (Protected)
+│   └── NotFound.tsx  # 404 page
+├── utils/
+│   └── pdfGenerator.ts
+└── App.tsx           # Main app with routing and auth
 ```
 
-**Edit a file directly in GitHub**
+## 🔧 Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+The application uses:
+- **Tailwind CSS** for styling with custom configuration
+- **shadcn/ui** for consistent component design
+- **React Router** for navigation and protected routes
+- **React Context** for authentication state management
+- **React Query** for data fetching and caching
 
-**Use GitHub Codespaces**
+## 🔒 Security Features
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Protected routes with authentication guards
+- Session persistence with localStorage
+- Password strength validation
+- Form validation and error handling
+- Secure logout functionality
+- Role-based access control (UI ready)
 
-## What technologies are used for this project?
+## 📈 Future Enhancements
 
-This project is built with:
+- [ ] Backend API integration
+- [ ] Real-time notifications
+- [ ] Advanced reporting with multiple chart types
+- [ ] Export to Excel/CSV functionality
+- [ ] Email notifications for payment reminders
+- [ ] Multi-currency support
+- [ ] Time tracking integration
+- [ ] Client management system
+- [ ] Invoice generation
+- [ ] Tax calculation features
+- [ ] Dark mode support
+- [ ] Mobile app version
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🤝 Contributing
 
-## How can I deploy this project?
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-Simply open [Lovable](https://lovable.dev/projects/ee8fd932-6db1-458c-bbe0-db61414c2c46) and click on Share -> Publish.
+## 📄 License
 
-## Can I connect a custom domain to my Lovable project?
+This project is licensed under the MIT License.
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+**Built with ❤️ for freelancers and small businesses**
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### 🎯 Quick Start Guide
+
+1. **Clone and install**: `npm install`
+2. **Start development**: `npm run dev`
+3. **Sign in with demo**: `demo@example.com` / `password`
+4. **Explore features**: Dashboard, Income tracking, User management, Profile, Settings
+5. **Test authentication**: Try accessing protected routes without signing in
