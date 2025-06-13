@@ -145,7 +145,7 @@ const SignIn = () => {
               </Button>
             </form>
 
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-gray-200" />
               </div>
@@ -163,9 +163,9 @@ const SignIn = () => {
                 <Chrome className="mr-2 h-4 w-4" />
                 Google
               </Button>
-            </div>
+            </div> */}
 
-            <div className="text-center">
+            {/* <div className="text-center">
               <p className="text-sm text-gray-600">
                 Don't have an account?{' '}
                 <Link
@@ -175,14 +175,14 @@ const SignIn = () => {
                   Sign up
                 </Link>
               </p>
-            </div>
+            </div> */}
 
             {/* Demo Credentials */}
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+            {/* <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
               <p className="text-xs text-blue-800 font-medium mb-1">Demo Credentials:</p>
               <p className="text-xs text-blue-700">Email: demo@example.com</p>
               <p className="text-xs text-blue-700">Password: password</p>
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </div>

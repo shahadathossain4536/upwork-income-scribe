@@ -12,6 +12,7 @@ import { incomeService } from '@/lib/services/incomeService';
 import { expenseService } from '@/lib/services/expenseService';
 import { collaborationService, Collaboration } from '@/lib/services/collaborationService';
 import { toast } from 'sonner';
+import { reportsService } from '@/lib/services/reportsService';
 
 export interface IncomeEntry {
   _id: string;
@@ -62,6 +63,7 @@ const Index = () => {
   const [isEditingDate, setIsEditingDate] = useState(false);
 
   const [incomeEntries, setIncomeEntries] = useState<IncomeEntry[]>([]);
+  console.log('incomeEntries', incomeEntries);
   const [costEntries, setCostEntries] = useState<CostEntry[]>([]);
   const [collaborations, setCollaborations] = useState<Collaboration[]>([]);
 
@@ -74,6 +76,11 @@ const Index = () => {
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const [deletingIncomeId, setDeletingIncomeId] = useState<string | null>(null);
   const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null);
+
+  // Add state for totals from backend
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [netProfit, setNetProfit] = useState(0);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -94,9 +101,25 @@ const Index = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // Load income entries
       const { startDate, endDate } = getCurrentReportDates();
 
+      // Load dashboard data from backend
+      const dashboardResponse = await reportsService.getDashboard({
+        startDate,
+        endDate
+      });
+
+      if (dashboardResponse.success && dashboardResponse.data) {
+        // Use the aggregated data from backend
+        const { overview } = dashboardResponse.data;
+        setTotalIncome(overview.totalIncome);
+        setTotalExpenses(overview.totalExpenses);
+        setNetProfit(overview.netProfit);
+      }
+
+      console.log('dashboardResponse', dashboardResponse);
+
+      // Load income entries for the list
       const incomeResponse = await incomeService.getIncome({
         startDate,
         endDate,
@@ -106,8 +129,9 @@ const Index = () => {
       if (incomeResponse.success && incomeResponse.data) {
         setIncomeEntries(incomeResponse.data || []);
       }
+      console.log('incomeResponse', incomeResponse.data);
 
-      // Load expense entries
+      // Load expense entries for the list
       const expenseResponse = await expenseService.getExpenses({
         startDate,
         endDate,
@@ -133,10 +157,6 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-
-  const totalIncome = incomeEntries.reduce((sum, entry) => sum + entry.amount, 0);
-  const totalCosts = costEntries.reduce((sum, entry) => sum + entry.amount, 0);
-  const netProfit = totalIncome - totalCosts;
 
   const handleAddIncome = async (incomeData: { date: string; jobTitle: string; clientName: string; billAmount: number; workDate: string }) => {
     setIsAddingIncome(true);
@@ -310,7 +330,7 @@ const Index = () => {
       costEntries,
       collaborations,
       totalIncome,
-      totalCosts,
+      totalCosts: totalExpenses,
       netProfit
     };
     generatePDF(reportData);
@@ -335,6 +355,19 @@ const Index = () => {
   return (
     <div className="p-6">
       <div className="max-w-7xl mx-auto space-y-8">
+ {/* Header */}
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Financial Overview
+          </h1>
+
+        </div>
+            {/* Summary Section */}
+        <SummarySection
+          totalIncome={totalIncome}
+          totalExpenses={totalExpenses}
+          netProfit={netProfit}
+        />
         {/* Header */}
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
@@ -346,6 +379,9 @@ const Index = () => {
         </div>
 
         {/* Quick Stats */}
+
+
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
             <CardContent className="p-6">
@@ -366,7 +402,7 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-red-600">Total Expenses</p>
-                  <p className="text-2xl font-bold text-red-900">${totalCosts.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-red-900">${totalExpenses.toLocaleString()}</p>
                 </div>
                 <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
                   <TrendingUp className="h-6 w-6 text-white" />
@@ -555,7 +591,7 @@ const Index = () => {
                         <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
                           <p className="font-medium">💡 Note:</p>
                           <p>• Profit sharing is calculated from net profit (${netProfit.toLocaleString()})</p>
-                          <p>• Net profit = Total Income (${totalIncome.toLocaleString()}) - Total Expenses (${totalCosts.toLocaleString()})</p>
+                          <p>• Net profit = Total Income (${totalIncome.toLocaleString()}) - Total Expenses (${totalExpenses.toLocaleString()})</p>
                           <p>• Each member gets their share percentage of the net profit</p>
                         </div>
                       </div>
@@ -567,7 +603,7 @@ const Index = () => {
                         <div className="p-3 bg-yellow-50 rounded text-xs text-yellow-700">
                           <p className="font-medium">⚠️ No Net Profit Available</p>
                           <p>• Total Income: ${totalIncome.toLocaleString()}</p>
-                          <p>• Total Expenses: ${totalCosts.toLocaleString()}</p>
+                          <p>• Total Expenses: ${totalExpenses.toLocaleString()}</p>
                           <p>• Net Profit: ${netProfit.toLocaleString()}</p>
                           <p>• Profit sharing will be available when net profit is positive</p>
                         </div>
@@ -589,7 +625,7 @@ const Index = () => {
                       <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
                         <p className="font-medium">📊 Financial Summary:</p>
                         <p>• Total Income: ${totalIncome.toLocaleString()}</p>
-                        <p>• Total Expenses: ${totalCosts.toLocaleString()}</p>
+                        <p>• Total Expenses: ${totalExpenses.toLocaleString()}</p>
                         <p>• Net Profit: ${netProfit.toLocaleString()}</p>
                         <p>• Profit Sharing Base: ${netProfit > 0 ? netProfit.toLocaleString() : '0'}</p>
                       </div>
@@ -751,12 +787,7 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Summary Section */}
-        <SummarySection
-          totalIncome={totalIncome}
-          totalCosts={totalCosts}
-          netProfit={netProfit}
-        />
+
 
         {/* Generate PDF Button */}
         <div className="text-center">

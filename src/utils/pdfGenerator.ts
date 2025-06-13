@@ -44,7 +44,8 @@ export function generatePDF({
     theme: 'grid',
     headStyles: { fillColor: [46, 204, 113] },
     styles: { fontSize: 10, cellPadding: 2 },
-    margin: { left: 14, right: 14 }
+    margin: { left: 14, right: 14 },
+    tableWidth: 'auto'
   });
 
   // Expenses Table
@@ -62,37 +63,61 @@ export function generatePDF({
     theme: 'grid',
     headStyles: { fillColor: [231, 76, 60] },
     styles: { fontSize: 10, cellPadding: 2 },
-    margin: { left: 14, right: 14 }
+    margin: { left: 14, right: 14 },
+    tableWidth: 'auto'
   });
 
   // Work Together (Collaborations)
+  const expensesTableFinalY = (doc as any).lastAutoTable.finalY || finalY + 18;
+  let currentY = expensesTableFinalY + 14;
   doc.setFontSize(14);
-  doc.text('Work Together (Collaborations)', 14, finalY + 14);
+  doc.text('Work Together (Collaborations)', 14, currentY);
 
   if (collaborations && collaborations.length > 0) {
-    collaborations.forEach((collab: any, idx: number) => {
-      const y = (doc as any).lastAutoTable?.finalY + 10 || finalY + 22 + idx * 8;
-      doc.setFontSize(12);
-      doc.text(`${collab.name}${collab.description ? ' - ' + collab.description : ''}`, 16, y);
+    // Filter out collaborations with empty or whitespace-only names
+    const validCollaborations = collaborations.filter(
+      (collab: any) => collab.name && collab.name.trim() !== ''
+    );
+
+    validCollaborations.forEach((collab: any, idx: number) => {
+      currentY = ((doc as any).lastAutoTable?.finalY || currentY) + 10;
+      // Only render the title if it is not empty
+      if (collab.name && collab.name.trim() !== '') {
+        doc.setFontSize(12);
+        doc.text(
+          `${collab.name}${collab.description ? ' - ' + collab.description : ''}`,
+          16,
+          currentY
+        );
+      }
 
       // Table for members
       autoTable(doc, {
-        startY: y + 2,
+        startY: currentY + 2,
         head: [['Member', 'Share (%)', 'Profit Share ($)']],
         body: collab.members.map((member: any) => [
-          `${member.user.firstName || ''} ${member.user.lastName || ''}`.trim() || member.user.email || member.user._id,
+          `${member.user.firstName || ''} ${member.user.lastName || ''}`.trim() ||
+            member.user.email ||
+            member.user._id,
           member.sharePercentage + '%',
-          netProfit > 0 ? ((netProfit * member.sharePercentage) / 100).toFixed(2) : '0.00'
+          netProfit > 0
+            ? ((netProfit * member.sharePercentage) / 100).toFixed(2)
+            : '0.00'
         ]),
         theme: 'grid',
         headStyles: { fillColor: [155, 89, 182] },
         styles: { fontSize: 10, cellPadding: 2 },
-        margin: { left: 22, right: 14 }
+        margin: { left: 14, right: 14 },
+        tableWidth: 'auto'
       });
     });
   } else {
     doc.setFontSize(12);
-    doc.text('No collaborations found for this period.', 16, finalY + 22);
+    doc.text(
+      'No collaborations found for this period.',
+      16,
+      currentY + 8
+    );
   }
 
   // Footer
