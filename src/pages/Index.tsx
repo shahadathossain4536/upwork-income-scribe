@@ -9,13 +9,12 @@ import {
   FaEdit, 
   FaFilePdf, 
   FaDollarSign, 
-  FaTrendingUp, 
+  FaArrowUp,
   FaUsers, 
   FaChartBar,
   FaUserPlus,
   FaUpload,
   FaTrashAlt,
-  FaMoney,
   FaReceipt,
   FaHandshake
 } from 'react-icons/fa';
@@ -40,6 +39,7 @@ export interface IncomeEntry {
   amount: number;
   category: string;
   paymentStatus: string;
+  workDate?: string;
 }
 
 export interface CostEntry {
@@ -49,6 +49,13 @@ export interface CostEntry {
   amount: number;
   category: string;
   vendor?: string;
+  workDate?: string;
+}
+
+export interface Collaborator {
+  id: string;
+  name: string;
+  sharePercentage: number;
 }
 
 const Index = () => {
@@ -148,7 +155,7 @@ const Index = () => {
       });
 
       if (incomeResponse.success && incomeResponse.data) {
-        setIncomeEntries(incomeResponse.data || []);
+        setIncomeEntries(Array.isArray(incomeResponse.data) ? incomeResponse.data : []);
       }
       console.log('incomeResponse', incomeResponse.data);
 
@@ -160,7 +167,7 @@ const Index = () => {
       });
 
       if (expenseResponse.success && expenseResponse.data) {
-        setCostEntries(expenseResponse.data || []);
+        setCostEntries(Array.isArray(expenseResponse.data) ? expenseResponse.data : []);
       }
 
       // Load collaborations
@@ -169,7 +176,7 @@ const Index = () => {
       });
 
       if (collaborationResponse.success && collaborationResponse.data) {
-        setCollaborations(collaborationResponse.data || []);
+        setCollaborations(Array.isArray(collaborationResponse.data) ? collaborationResponse.data : []);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -563,7 +570,7 @@ const Index = () => {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="text-xl flex items-center gap-3">
-                  <FaMoney className="text-emerald-600" />
+                  <FaDollarSign className="text-emerald-600" />
                   Income {incomeEntries.length > 0 ? `(${incomeEntries.length})` : ''}
                 </CardTitle>
                 <div className="flex gap-3">
